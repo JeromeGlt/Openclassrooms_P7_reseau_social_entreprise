@@ -18,7 +18,9 @@
                 <label id="user_imageUrl_label" for="user_imageUrl">Ajouter votre image</label>
                 <input type="file" id="user_imageUrl" name="imageUrl" @change="uploadFile($event)">
             </div>
-            <router-link to='/posts' id="send_button" @click="click">Créer mon compte</router-link>
+            <p id="alert" v-if="!this.pseudo || !this.email || !this.imageUrl || !this.password">Veuillez remplir tous les champs pour créer votre compte</p>
+            <router-link v-if="this.pseudo && this.email && this.password && this.imageUrl" to='/posts' id="send_button" @click="click">Créer mon compte</router-link>
+            <p id="loginLink">Si vous avez déjà un compte, <router-link id="login_link_router" to="/login">cliquez ici !</router-link></p>
         </div>
     </div>
 </template>
@@ -58,7 +60,7 @@ export default {
     #welcome_signup {
         min-height: 100vh;
         color: #212E53;
-        background: #BED3C3;
+        background: #E2E9C0;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
     }
     #signup {
@@ -139,5 +141,24 @@ export default {
             color: #212E53;
         }
     }
-
+    #alert {
+        width: 90%;
+        margin: 1rem 0;
+        text-align: center;
+        font-size: 1.2em;
+        padding: 0.2rem;
+        background: rgba(255, 0, 0, 0.2);
+    }
+    #loginLink {
+        margin: 1rem 0;
+        font-size: 1.2em;
+        text-align: center;
+    }
+    #login_link_router {
+    text-decoration: none;
+    color: #212E53;
+    &:active {
+        text-decoration: none;
+    }
+}
 </style>

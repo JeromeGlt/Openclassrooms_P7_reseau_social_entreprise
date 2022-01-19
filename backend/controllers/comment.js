@@ -9,11 +9,14 @@ const User = require('../models/user')
 // }
 
 exports.createComment = (req, res, next) => {
-    const commentObject = {...req.body}
     console.log(req.body)
 
+    if(req.body.text === 'undefined') {
+        req.body.text = null
+    }
+
     const comment = Comment.create({
-        ...commentObject,
+        text: req.body.text,
         imageUrl: req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null,
         user_id: +req.body.userId,
         post_id: +req.body.postId
@@ -26,11 +29,16 @@ exports.createComment = (req, res, next) => {
 
 exports.modifyComment = (req, res, next) => {
     console.log(req.body)
+
+    if(req.body.text === 'undefined') {
+        req.body.text = null
+    }
+
     const commentObject = req.file ? {
-        ...req.body,
+        text: req.body.text,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : {
-        ...req.body,
+        text: req.body.text,
         imageUrl: null
     }
         Comment.update({ ...commentObject }, { where : { id : req.params.id }})

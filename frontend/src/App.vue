@@ -17,7 +17,7 @@ export default {
 <style scoped lang='scss'>
 #general {
     background: #E2E9C0;
-    height: auto;
+    min-height: 100vh;
 }
 #app {
     display: flex;

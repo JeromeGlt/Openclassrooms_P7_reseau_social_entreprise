@@ -10,7 +10,6 @@ const userRoutes = require('./routes/user')
 const likeRoutes = require('./routes/like')
 const commentRoutes = require('./routes/comment')
 const refreshRoutes = require('./routes/refresh')
-const rateLimiter = require('./middleware/rate-limit')
 
 const app = express()
 
@@ -21,7 +20,7 @@ app.use(express.json())
 
 app.use('/images', express.static(path.join(__dirname, 'images')))
 
-app.use('/api/auth', rateLimiter, userRoutes)
+app.use('/api/auth', userRoutes)
 app.use('/api/posts', postRoutes)
 app.use('/api/posts', commentRoutes)
 app.use('/api/posts', likeRoutes)

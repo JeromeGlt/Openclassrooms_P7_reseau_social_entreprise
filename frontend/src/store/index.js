@@ -84,11 +84,14 @@ const store = createStore({
             .catch(err => console.log(err))
         },
         deleteUser({ state }) {
+
+            let storageToken = localStorage.getItem('token')
+
             fetch('http://localhost:3000/api/auth/profile/delete/' + state.pseudo, {
                 method: 'delete',
                 headers: {
                     'Accept': 'application/json',
-                    'Authorization': 'Bearer ' + state.token
+                    'Authorization': 'Bearer ' + storageToken
                 }
             })
                 .then(res => res.json())
@@ -109,7 +112,23 @@ const store = createStore({
                 .then(data => commit('GET_USER_ID', data))
                 .catch(err => console.log(err))
         },
-        modifyProfile({ commit }, { bodyProfile, userId }) {
+        modifyImageProfile({ dispatch }, { bodyProfile, userId }) {
+
+            let storageToken = localStorage.getItem('token')
+
+            fetch('http://localhost:3000/api/auth/profile/' + userId, {
+                method: 'put',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + storageToken
+                },
+                body: bodyProfile
+            })
+                .then(res => res.json())
+                .then(data => dispatch('getUserDatas', data))
+                .catch(err => console.log(err))
+        },
+        modifyEmailProfile({ dispatch }, { bodyProfile, userId }) {
 
             let storageToken = localStorage.getItem('token')
 
@@ -123,7 +142,7 @@ const store = createStore({
                 body: JSON.stringify(bodyProfile)
             })
                 .then(res => res.json())
-                .then(data => commit('SIGNUP', data))
+                .then(data => dispatch('getUserDatas', data))
                 .catch(err => console.log(err))
         },
         // Quatre actions concernant les publications - Create, Delete, Get et Put
@@ -194,6 +213,7 @@ const store = createStore({
         },
         // Quatre actions concernant les commentaires - Create, Delete, Get et Modify
         createComment({ dispatch }, formData) {
+            
             let storageToken = localStorage.getItem('token')
 
             console.log(formData)

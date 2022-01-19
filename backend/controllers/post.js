@@ -11,11 +11,14 @@ exports.getAllPosts = (req, res, next) => {
 }
 
 exports.createPost = (req, res, next) => {
-    const postObject = {...req.body}
     console.log(req.body)
 
+    if(req.body.text === 'undefined') {
+        req.body.text = null
+    }
+
     const post = Post.create({
-        ...postObject,
+        text: req.body.text,
         likes: 0,
         imageUrl: req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null,
         user_id: +req.body.userId
@@ -28,11 +31,16 @@ exports.createPost = (req, res, next) => {
 
 exports.modifyPost = (req, res, next) => {
     console.log(req.body)
+
+    if(req.body.text === 'undefined') {
+        req.body.text = null
+    }
+
     const postObject = req.file ? {
-        ...req.body,
+        text: req.body.text,
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : {
-        ...req.body,
+        text: req.body.text,
         imageUrl: null
     }
     Post.update({ ...postObject }, { where :  { id : req.params.id }})

@@ -9,6 +9,7 @@
             <input type="file" id="post_imageUrl" name="imageUrl" @change="uploadFile($event)">
             <label for="post_imageUrl" id="post_imageUrl_label">Ajouter un fichier...</label>
         </div>
+        <div id="alertPost" v-if="alertPost">Veuillez ajouter du texte ou une image</div>
         <button id="sendButton" @click="sendPost">Publier</button>
     </div>
     <ul id='posts'>
@@ -32,15 +33,24 @@ export default {
     computed: {
         ...mapState(['pseudo', 'userId', 'posts'])
     },
+    data: () => ({
+        alertPost: false
+    }),
     methods: {
         sendPost() {
+
+            if((this.text === undefined || this.text === "") && this.imageUrl === undefined) {
+                return this.alertPost = true
+            } else {
+                this.alertPost = false
+            }
+
             let formData = new FormData()
             formData.append('text', this.text)
             formData.append('imageUrl', this.imageUrl)
             formData.append('userId', this.userId)
 
             this.$store.dispatch('createPost', formData)
-            document.getElementById('post_text').value = ""
         },
         uploadFile(event) {
             console.log(event.target.files)
@@ -118,6 +128,10 @@ export default {
         cursor: pointer;
         padding: 0.7em 0.5em;
     }
+    #alertPost {
+        background: rgba(255, 0, 0, 0.2);
+        padding: 0.2rem;
+    }
     #sendButton {
         width: 20%;
         color: #fff;
@@ -137,5 +151,9 @@ export default {
             background: #BED3C3;
             color: #212E53;
         }
+    }
+    ul {
+        display: flex;
+        flex-direction: column-reverse;
     }
 </style>

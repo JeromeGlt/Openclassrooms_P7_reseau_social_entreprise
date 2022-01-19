@@ -10,7 +10,8 @@
                 <label for='password'>Mot de passe</label>
                 <input type="password" id="password" name="user_password" v-model="password">
             </div>
-            <router-link to='/posts' id='connection_button' @click="login">Connexion</router-link>
+            <p id="alert" v-if="!this.pseudo || !this.password">Veuillez remplir les champs pour vous connecter</p>
+            <router-link v-if="this.pseudo && this.password" to='/posts' id='connection_button' @click="login">Connexion</router-link>
 
         <p id="signup_link">Si vous n'avez pas encore créé de compte, <router-link id="signup_link_router" to='/signup'>cliquez ici</router-link> !</p>
         </div>
@@ -31,10 +32,12 @@ export default {
     },
     methods: {
         login() {
+            
             let loginData = {
                 pseudo: this.pseudo,
                 password: this.password
             }
+
             console.log(loginData)
             this.$store.dispatch('submitLogin', loginData)
         }
@@ -46,7 +49,7 @@ export default {
 
 #welcome_login {
     min-height: 100vh;
-    background: #BED3C3;
+    background: #E2E9C0;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 #welcome_title {
@@ -79,7 +82,7 @@ input {
     margin: 20px auto;
 }
 label {
-    color: rgb(11, 0, 107);
+    color: #212E53;
     font-size: 1.2em;
     font-weight: bold;
 }
@@ -124,4 +127,12 @@ label {
         text-decoration: none;
     }
 }
+#alert {
+        width: 90%;
+        margin: 1rem 0;
+        text-align: center;
+        font-size: 1.2em;
+        padding: 0.2rem;
+        background: rgba(255, 0, 0, 0.2);
+    }
 </style>

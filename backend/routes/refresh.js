@@ -4,6 +4,6 @@ const router = express.Router()
 const RefreshCtrl = require('../controllers/refresh')
 
 router.get('/', RefreshCtrl.getUserDatas)
-// router.get('/profile', RefreshCtrl.getUserDatas)
+router.get('/:user_id', RefreshCtrl.getUserPseudo)
 
 module.exports = router

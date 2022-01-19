@@ -2,15 +2,15 @@
     <div id="post" v-if="isPostOpened">
         <div id="bodyPost">
             <div id="userImageContainer">
-                <img id="userImage" :src="imageUrl"/>
+                <img id="userImage" :src="postData.user.imageUrl"/>
             </div>
             {{ postData.user.pseudo }}
             {{ postData.createdAt }}
-            <button id="deleteButton" title="Supprimer" @click="deletePost(postData.id)">X</button>
-            <button v-if="isModifyButtonShowed" title="Modifier" id="modifyButton" @click="doubleFunction">R</button>
+            <button v-if="pseudo === postData.user.pseudo || isAdmin === 1" title="Modifier" id="modifyButton" @click="doubleFunction"><img class="modifyIcon" src="../assets/edit-regular.svg"/></button>
+            <button v-if="pseudo === postData.user.pseudo || isAdmin === 1" id="deleteButton" title="Supprimer" @click="deletePost(postData.id)">X</button>
         </div>
         {{ postData.text }}
-        <img id="postImage" :src="postData.imageUrl"/>
+        <img class="postImage" :src="postData.imageUrl"/>
         <div id="buttons">
             <div id="likesButton">
                 <button class="interactionButton" @click="clickLike(this.postData.id, this.userId)">J'aime</button>
@@ -34,9 +34,10 @@
             <button id="cancelButton" title="Annuler" @click="doubleFunction">X</button>
         </div>
         <textarea id="post_text_modify" name="postText_modify" rows="2" cols="40" v-model="text"></textarea>
-        <img :src="postData.imageUrl"/>
+        <img class="postImage" :src="postData.imageUrl"/>
         <input type="file" id="post_imageUrl_modify" name="imageUrl_modify" @change="uploadFile($event)">
         <label for="post_imageUrl_modify" id="post_imageUrl_modify_label">Ajouter un fichier...</label>
+        <div id="alertPostModify" v-if="alertPost">Veuillez ajouter du texte ou une image</div>
         <button id="modifyingButton" @click="sendModifiedPost(postData.id)">Envoyer</button>
     </div>
 
@@ -45,7 +46,8 @@
     <div id="commentCreation" v-if="isCommentDialogOpened">
         <div id="separation"></div>
         <label for="comment">Ecrire un commentaire...</label>
-        <textarea id="comment_text" name="commentName" rows="2" cols="40" v-model="text"></textarea>
+        <textarea id="comment_text" name="commentName" rows="2" cols="35" v-model="text"></textarea>
+        <div id="alertPost" v-if="alertPost">Veuillez ajouter du texte ou une image</div>
         <div id="commentButtons">
             <input type="file" id="comment_imageUrl" name="imageUrl" @change="uploadFile($event)">
             <label for="comment_imageUrl" id="comment_imageUrl_label">Ajouter un fichier...</label>
@@ -69,7 +71,7 @@ export default {
         'postData'
     ],
     computed: {
-        ...mapState(['pseudo', 'userId', 'imageUrl'])
+        ...mapState(['pseudo', 'userId'])
         // ...mapState({
         //     pseudo: state => state.pseudo,
         //     userId: state => state.userId,
@@ -81,12 +83,15 @@ export default {
         isCommentsVisible: false,
         isModifyDialogOpened: false,
         isPostOpened: true,
-        isModifyButtonShowed: true
+        alertPost: false
     }),
     methods: {
         doubleFunction() {
             this.postOpened(),
             this.showModifyDialog()
+
+            this.isCommentDialogOpened = false
+            this.isCommentsVisible = false
         },
         deletePost(id) {
             this.$store.dispatch('deletePost', id)
@@ -96,9 +101,16 @@ export default {
             this.imageUrl = event.target.files[0]
         },
         sendComment(id) {
+
+            if((this.text === undefined || this.text === "") && this.imageUrl === undefined) {
+                return this.alertPost = true
+            } else {
+                this.alertPost = false
+            }
+
             let formData = new FormData()
             formData.append('text', this.text)
-            formData.append('imageUrl', this.commentImageUrl)
+            formData.append('imageUrl', this.imageUrl)
             formData.append('userId', this.userId)
             formData.append('postId', id)
 
@@ -141,6 +153,13 @@ export default {
             }
         },
         sendModifiedPost(id) {
+
+            if((this.text === undefined || this.text === "") && this.imageUrl === undefined) {
+                return this.alertPost = true
+            } else {
+                this.alertPost = false
+            }
+
             let formData = new FormData()
             formData.append('text', this.text)
             formData.append('imageUrl', this.imageUrl)
@@ -148,16 +167,6 @@ export default {
 
             this.$store.dispatch('modifyPost', { id, formData })
             document.getElementById('post_text_modify').value = ""
-        },
-        showModifyButton() {
-            console.log(this.userId)
-            console.log(this.postData.user.userId)
-            if(this.pseudo !== this.postData.user.pseudo) {
-                this.isModifyButtonShowed = !this.isModifyButtonShowed
-            }
-        },
-        beforeCreate() {
-            this.showModifyButton()
         }
     }
 }
@@ -209,8 +218,14 @@ export default {
         cursor: pointer;
     }
     #modifyButton {
-        color: #fff;
-        background: blue;
+        width: 3.5%;
+        background: none;
+        outline: none;
+        border: none;
+        cursor: pointer;
+    }
+    .modifyIcon {
+        width: 100%;
     }
     #buttons {
         width: 100%;
@@ -225,7 +240,7 @@ export default {
     #likesNumber {
         margin: auto 0.4rem;
     }
-    #postImage {
+    .postImage {
         max-width: 80%;
         margin-top: 1rem;
     }
@@ -242,7 +257,7 @@ export default {
     }
     #commentsList {
         width: 60%;
-        margin: auto;
+        margin: 0 auto;
         background: #fcfcfc;
         border-radius: 0 0 15px 15px;
         box-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
@@ -290,6 +305,11 @@ export default {
             background: #BED3C3;
             color: #212E53;
         }
+    }
+    #alertPostModify {
+        background: rgba(255, 0, 0, 0.2);
+        padding: 0.2rem;
+        margin-bottom: 1rem;
     }
     #post_text_modify {
         border-radius: 10px;
@@ -373,6 +393,12 @@ export default {
         border-radius: 5px;
         cursor: pointer;
         padding: 0.7rem 0.5rem;
+    }
+    #alertPost {
+        background: rgba(255, 0, 0, 0.2);
+        padding: 0.2rem;
+        margin-top: 1rem;
+        font-size: 0.9em;
     }
     #commentSendButton {
         width: 28%;
