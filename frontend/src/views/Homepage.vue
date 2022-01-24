@@ -9,7 +9,9 @@
             <input type="file" id="post_imageUrl" name="imageUrl" @change="uploadFile($event)">
             <label for="post_imageUrl" id="post_imageUrl_label">Ajouter un fichier...</label>
         </div>
-        <div id="alertPost" v-if="alertPost">Veuillez ajouter du texte ou une image</div>
+        <div id="alertPost" v-if="alertPost">
+            Veuillez ajouter du texte ou une image
+        </div>
         <button id="sendButton" @click="sendPost">Publier</button>
     </div>
     <ul id='posts'>
@@ -34,7 +36,8 @@ export default {
         ...mapState(['pseudo', 'userId', 'posts'])
     },
     data: () => ({
-        alertPost: false
+        alertPost: false,
+        text: ''
     }),
     methods: {
         sendPost() {
@@ -62,9 +65,6 @@ export default {
         getUserDatas() {
             this.$store.dispatch('getUserDatas')
         },
-        // loadAllComments() {
-        //     this.$store.dispatch('loadAllComments')
-        // },
         logout() {
             localStorage.clear()
         }
@@ -72,8 +72,12 @@ export default {
     beforeMount() {
         this.getUserDatas(),
         this.loadAllPosts()
-        // this.loadAllComments()
     }
+    // mounted() {
+    //     this.getUserDatas(),
+    //     this.loadAllPosts()
+    //     console.log('test')
+    // }
 }
 </script>
 

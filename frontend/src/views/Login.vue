@@ -11,25 +11,29 @@
                 <input type="password" id="password" name="user_password" v-model="password">
             </div>
             <p id="alert" v-if="!this.pseudo || !this.password">Veuillez remplir les champs pour vous connecter</p>
-            <router-link v-if="this.pseudo && this.password" to='/posts' id='connection_button' @click="login">Connexion</router-link>
+            <button v-if="this.pseudo && this.password" id='connection_button' @click="login">Connexion</button>
 
         <p id="signup_link">Si vous n'avez pas encore créé de compte, <router-link id="signup_link_router" to='/signup'>cliquez ici</router-link> !</p>
+        <div id="message" v-if="message">{{ message }}</div>
         </div>
     </div>
 </template>
 
 <script>
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
+
+import { mapState } from 'vuex'
 
 export default {
     name: 'Login',
-    data() {
-        return {
+    computed: {
+        ...mapState({
+            message: state => state.message
+        }),
+    },
+    data: () => ({
             pseudo: '',
             password: ''
-        }
-    },
+    }),
     methods: {
         login() {
             
@@ -64,7 +68,7 @@ export default {
 }
 #login {
     width: 350px;
-    height: 500px;
+    height: auto;
     background: #fcfcfc;
     overflow: hidden;
     border-radius: 10px;
@@ -113,6 +117,12 @@ label {
         background: #BED3C3;
         color: #212E53;
     }
+}
+#message {
+    padding: 0.5rem;
+    background: rgba(255, 0, 0, 0.2);
+    margin-bottom: 0.5rem;
+    color: #212E53;
 }
 #signup_link {
     margin: 20px;

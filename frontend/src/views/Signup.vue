@@ -4,22 +4,26 @@
             <p id="signup_presentation">Veuillez remplir tous les champs afin de créer votre compte</p>
             <div class="form">
                 <label for='email'>Email</label>
-                <input type="text" id="user_email" name="email" v-model="email">
+                <input type="text" name="email" v-model="email" @change="emailInput">
+                <div class="alert" v-if="alertEmail">Veuillez renseigner une adresse mail valide. Exemple: jean@dupont.fr</div>
             </div>
             <div class="form">
                 <label for='pseudo'>Pseudo</label>
-                <input type="text" id="user_pseudo" name="pseudo" v-model="pseudo">
+                <input type="text" name="pseudo" v-model="pseudo" @change="pseudoInput">
+                <div class="alert" v-if="alertPseudo">Le pseudo doit contenir entre 5 et 40 caractères. Seuls les lettres, points et tirets sont autorisés</div>
             </div>
             <div class="form">
                 <label for='password'>Mot de passe</label>
-                <input type="password" id="user_password" name="password" v-model="password">
+                <input type="password" name="password" v-model="password" @change="passwordInput">
+                <div class="alert" v-if="alertPassword">Le mot de passe doit contenir entre 8 et 100 caractères dont une minuscule, une majuscule et un chiffre</div>
             </div>
             <div class="form">
                 <label id="user_imageUrl_label" for="user_imageUrl">Ajouter votre image</label>
                 <input type="file" id="user_imageUrl" name="imageUrl" @change="uploadFile($event)">
             </div>
-            <p id="alert" v-if="!this.pseudo || !this.email || !this.imageUrl || !this.password">Veuillez remplir tous les champs pour créer votre compte</p>
-            <router-link v-if="this.pseudo && this.email && this.password && this.imageUrl" to='/posts' id="send_button" @click="click">Créer mon compte</router-link>
+            <p id="alert" v-if="!this.pseudo || !this.email || !this.imageUrl || !this.password || alertEmail ||alertPseudo || alertPassword">Veuillez remplir tous les champs pour créer votre compte</p>
+            <button v-if="this.pseudo && this.email && this.password && this.imageUrl && !alertEmail && !alertPseudo && !alertPassword" id="send_button" @click="click">Créer mon compte</button>
+            <div class="alert" v-if="message">{{ message }}</div>
             <p id="loginLink">Si vous avez déjà un compte, <router-link id="login_link_router" to="/login">cliquez ici !</router-link></p>
         </div>
     </div>
@@ -27,19 +31,49 @@
 
 <script>
 
+import { mapState } from 'vuex'
+
 export default {
 
     name: 'Signup',
-    data() {
-        return {
+    computed: {
+        ...mapState({
+            message: state => state.message
+        }),
+    },
+    data: () => ({
             pseudo: '',
             password: '',
             email: '',
-            imageUrl: ''
-        }
-    },
+            imageUrl: '',
+            alertEmail: false,
+            alertPseudo: false,
+            alertPassword: false
+    }),
     methods: {
+        emailInput() {
+            if(!/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,3}))$/i.test(this.email)) {
+                return this.alertEmail = true
+            } else {
+                this.alertEmail = false
+            }
+        },
+        pseudoInput() {
+            if(/[^a-zA-Z-_.]/i.test(this.pseudo)) {
+                return this.alertPseudo = true
+            } else {
+            this.alertPseudo = false
+            }
+        },
+        passwordInput() {
+            if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,100}$/.test(this.password)) {
+                return this.alertPassword = true
+            } else {
+                this.alertPassword = false
+            }
+        },
         click() {
+
             let formData = new FormData()
             formData.append('pseudo', this.pseudo)
             formData.append('password', this.password)
@@ -47,6 +81,7 @@ export default {
             formData.append('email', this.email)
                 
             this.$store.dispatch('submitSignup', formData)
+
         },
         uploadFile(event) {
             this.imageUrl = event.target.files[0]
@@ -84,10 +119,7 @@ export default {
         margin: 1em 2.5em;
     }
     input {
-        width: 100%;
-        height: 50%;
         border: none;
-        outline: none;
         border-radius: 5px;
         padding: 10px;
         margin: 20px auto;
@@ -155,10 +187,16 @@ export default {
         text-align: center;
     }
     #login_link_router {
-    text-decoration: none;
-    color: #212E53;
-    &:active {
         text-decoration: none;
+        color: #212E53;
+        &:active {
+            text-decoration: none;
+        }
     }
-}
+    .alert {
+        text-align: center;
+        background: rgba(255, 0, 0, 0.2);
+        margin: 0 0.3rem 0.5rem 0.3rem;
+        padding: 0.5rem;
+    }
 </style>

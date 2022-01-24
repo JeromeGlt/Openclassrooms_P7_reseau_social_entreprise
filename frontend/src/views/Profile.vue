@@ -26,6 +26,9 @@
             <button id="sendModifiedEmail" @click="modifyProfile(userId)">Envoyer</button>
             <button class="cancelButton" title="Annuler" @click="doubleFunction">X</button>
         </div>
+            <div id="alertEmail" v-if="alertEmail">
+                Veuillez ajouter une adresse mail valide
+            </div>
         <!-- ------------------------------- -->
         <div class="elementPresentation">
             Votre pseudo est : {{ pseudo }}
@@ -57,7 +60,8 @@ export default {
     data: () => ({
         isModifyEmailDialogOpened: false,
         isEmailOpened: true,
-        isModifyImageProfileOpened: false
+        isModifyImageProfileOpened: false,
+        alertEmail: false
     }),
     methods: {
         logout() {
@@ -77,6 +81,7 @@ export default {
             this.$store.dispatch('getUserDatas')
         },
         sendModifiedImageProfile(userId) {
+
             let bodyProfile = new FormData()
             bodyProfile.append('imageUrl', this.imageUrl)
             console.log(bodyProfile)
@@ -98,6 +103,19 @@ export default {
             this.$store.commit('UPDATE_IMAGE_PROFILE', event.target.files[0])
         },
         modifyProfile(userId) {
+
+            if(this.email === undefined || this.email === "") {
+                return this.alertEmail = true
+            } else {
+                this.alertEmail = false
+            }
+
+            if(!/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,3}))$/i.test(this.email)) {
+                return this.alertEmail = true
+            } else {
+                this.alertEmail = false
+            }
+
             let bodyProfile = {
                 email: this.email
             }
@@ -240,6 +258,11 @@ export default {
         border-radius: 5px;
         cursor: pointer;
         padding: 0.7em 0.5em;
+    }
+    #alertEmail {
+        background: rgba(255, 0, 0, 0.2);
+        padding: 0.2rem;
+        font-size: 0.9em;
     }
     #countSuppression {
         border: #A7001E 5px solid;

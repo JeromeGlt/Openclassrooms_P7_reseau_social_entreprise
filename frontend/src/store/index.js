@@ -1,4 +1,5 @@
 import { createStore } from 'vuex'
+import router from '../router/index.js'
 
 // import { SET_NOTE } from '@/store/mutation-types'
 
@@ -10,6 +11,8 @@ const store = createStore({
         imageUrl: '',
         userId: '',
         token: '',
+        isAdmin: '',
+        message: '',
         posts: [],
     },
     getters: {
@@ -20,20 +23,25 @@ const store = createStore({
             state.email = data.email,
             state.imageUrl = data.imageUrl,
             state.userId = data.userId,
-            state.token = data.token
+            state.token = data.token,
+            state.isAdmin = data.isAdmin
+            state.message = data.message
           },
         LOGIN (state, data) {
             state.pseudo = data.pseudo,
             state.email = data.email,
             state.imageUrl = data.imageUrl,
             state.userId = data.userId,
-            state.token = data.token
+            state.token = data.token,
+            state.isAdmin = data.isAdmin
+            state.message = data.message
         },
         GET_USER_ID (state, data) {
             state.userId = data.userId,
             state.pseudo = data.pseudo,
             state.imageUrl = data.imageUrl,
-            state.email = data.email
+            state.email = data.email,
+            state.isAdmin = data.isAdmin
         },
         SET_POST (state, data) {
             state.posts = data
@@ -43,10 +51,7 @@ const store = createStore({
         },
         UPDATE_IMAGE_PROFILE (state, imageUrl) {
             state.imageUrl = imageUrl
-        },
-        // UPDATE_POST_TEXT (state, text) {
-        //     state.posts[text] = text
-        // }
+        }
     },
     actions: {
         // Cinq actions concernant les utilisateurs - Signup, Login, Get, Delete et Modify
@@ -61,7 +66,10 @@ const store = createStore({
             })
                 .then(res => res.json())
                 .then(data => {
-                    commit('SIGNUP', data),
+                    commit('SIGNUP', data)
+                    if(!data.message) {
+                        router.push('/posts')
+                    }
                     localStorage.setItem('token', data.token)
                 })
                 .catch(err => console.log(err))
@@ -78,7 +86,10 @@ const store = createStore({
             })
             .then(res => res.json())
             .then(data => {
-                commit('LOGIN', data),
+                commit('LOGIN', data)
+                if(!data.message) {
+                    router.push('/posts')
+                }
                 localStorage.setItem('token', data.token)
             })
             .catch(err => console.log(err))
@@ -263,21 +274,6 @@ const store = createStore({
                 })
                 .catch(err => console.log(err))
         },
-        // loadAllComments({ commit }) {
-
-        //     let storageToken = localStorage.getItem('token')
-
-        //     fetch('http://localhost:3000/api/comments', {
-        //         headers: {
-        //             'Accept': 'application/json',
-        //             'Authorization': 'Bearer ' + storageToken
-        //         }
-        //     })
-        //         .then(res => res.json())
-        //         .then(data => commit('SET_POST', data))
-        //         .catch(err => console.log(err))
-        // },
-        // Trois actions concernant les likes - Create, delete et get
         createLike({ dispatch }, bodyLike) {
 
             let storageToken = localStorage.getItem('token')

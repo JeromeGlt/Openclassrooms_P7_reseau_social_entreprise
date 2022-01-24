@@ -6,25 +6,20 @@ const emailValidator = require('email-validator')
 const fs = require('fs')
 const {Op} = require('sequelize')
 
-exports.getProfile = (req, res, next) => {
-    User.findOne({ where : { id: req.params.id }})
-        .then(user => res.status(200).json(user))
-        .catch(() => res.status(500).json({ message : 'Affichage de l\'utilisateur impossible' }))
-}
 
 exports.signup = (req, res, next) => {
     console.log(req.body)
     if(!passwordSchema.validate(req.body.password)) {
-        return res.status(500).json({ message : 'Attention : le mot de passe est invalide :(' })
+        return res.status(500)
     }
     if(!emailValidator.validate(req.body.email)) {
-        return res.status(500).json({ message : 'Attention : l\'email est invalide :(' })
+        return res.status(500)
     }
     if(!req.file.filename) {
-        return res.status(500).json({ message : 'Pensez à vous ajouter une image ;)' })
+        return res.status(500)
     }
     if(!req.body.pseudo) {
-        return res.status(500).json({ message : 'Pensez à vous créer un pseudo ;)' })
+        return res.status(500)
     }
     User.findOne({ where : {
         [Op.or]: [
@@ -48,19 +43,19 @@ exports.signup = (req, res, next) => {
                                 pseudo: user.pseudo,
                                 email: user.email,
                                 imageUrl: user.imageUrl,
+                                isAdmin: user.isAdmin,
                                 token: jwt.sign(
                                     {userId: user.id},
                                     process.env.TOKEN,
                                     {expiresIn: '24h'}
-                                ),
-                                message: 'Utilisateur créé !'
+                                )
                             })
                         })
                         .catch((error) => res.status(500).json({ error }))
                 })
-                .catch(() => res.status(500).json({ message : 'erreur dans le hash' }))
+                .catch((error) => res.status(500).json({ error }))
             }else{
-                res.status(403).json({ message : 'Email ou pseudo déjà utilisé :(' })
+                res.status(403).json({ message : 'Email ou pseudo déjà utilisé' })
             }
         })
         .catch((error) => res.status(500).json({ error }))  
@@ -71,29 +66,29 @@ exports.login = (req, res, next) => {
     User.findOne({ where : { pseudo: req.body.pseudo }})
         .then(user => {
             if(!user) {
-                return res.status(401).json({ message : 'Utilisateur non trouvé :(' })
+                return res.status(401).json({ message : 'Utilisateur non trouvé' })
             }
             bcrypt.compare(req.body.password, user.password)
                 .then(valid => {
                     if(!valid) {
-                        return res.status(401).json({ message : 'Mot de passe incorrect ;)' })
+                        return res.status(401).json({ message : 'Mot de passe incorrect' })
                     }
                     res.status(200).json({
                         userId: user.id,
                         pseudo: user.pseudo,
                         email: user.email,
                         imageUrl: user.imageUrl,
+                        isAdmin: user.isAdmin,
                         token: jwt.sign(
                             {userId: user.id},
                             process.env.TOKEN,
                             {expiresIn: '24h'}
-                        ),
-                        message : 'Utilisateur connecté !'
+                        )
                     })
                 })
-                .catch(() => res.status(500).json({ message : 'erreur dans le bcrypt compare' }))
+                .catch((error) => res.status(500).json({ error }))
         })
-        .catch(() => res.status(500).json({ message : 'erreur dans l\'identification du pseudo' }))
+        .catch((error) => res.status(500).json({ error }))
 }
 
 exports.modifyProfile = (req, res, next) => {
@@ -107,7 +102,7 @@ exports.modifyProfile = (req, res, next) => {
         console.log(userObject)
     User.update({ ...userObject }, { where : { id : req.params.id }})
         .then(() => res.status(200).json({ message : 'Utilisateur modifié' }))
-        .catch(() => res.status(500).json({ message : 'Erreur dans update' }))
+        .catch((error) => res.status(500).json({ error }))
 }
 
 exports.delete = (req, res, next) => {
@@ -115,17 +110,8 @@ exports.delete = (req, res, next) => {
     User.findOne({ where : { pseudo : req.params.pseudo }})
         .then(user => {
             if(!user) {
-                return res.status(401).json({ message : 'Utilisateur non trouvé :(' })
+                return res.status(401).json({ message : 'Utilisateur non trouvé' })
             }
-            // bcrypt.compare(req.body.password, user.password)
-            //     .then(valid => {
-            //         if(!valid) {
-            //             return res.status(401).json({ message : 'Mot de passe incorrect ;)' })
-            //         }
-            //         res.status(200)
-            //     })
-            //     .catch(() => res.status(500).json({ message : 'Erreur dans bcrypt' }))
-
             const filename = user.imageUrl.split('/images/')[1]
             fs.unlink(`images/${filename}`, () => {
                 User.destroy({ where : { pseudo : req.params.pseudo }})

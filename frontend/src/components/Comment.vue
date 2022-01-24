@@ -1,28 +1,42 @@
 <template>
     <div id="comment" v-if="isCommentOpened">
         <div id="separation"></div>
-        <div id="commentBody">
-            <div id="userImageContainer" v-if="commentAuthorImageUrl">
-                <img id="userImage" :src="commentAuthorImageUrl"/>
+        <div id="userComment">
+            <div id="userImageContainer" :style="{ backgroundImage: 'url(' + commentAuthorImageUrl + ')' }"></div>
+            <div id="user">
+                <div id="pseudo" v-if="commentAuthor">
+                    {{ commentAuthor }}
+                </div>
+                <div id="date">
+                    {{ formattedDate }}
+                </div>
             </div>
-            <div v-if="commentAuthor">{{ commentAuthor }}</div>
-            {{ commentData.createdAt }}
-            <button v-if="pseudo === commentAuthor || isAdmin === 1" title="Modifier commentaire" id="modifyCommentButton" @click="doubleFunction"><img class="modifyIcon" src="../assets/edit-regular.svg"/></button>
-            <button v-if="pseudo === commentAuthor || isAdmin === 1" title="Supprimer commentaire" id="deleteButton" @click="deleteComment(commentData.id)">X</button>
+            <div id="userButtons" v-if="pseudo === commentAuthor || isAdmin === 1">
+                <button title="Modifier commentaire" id="modifyCommentButton" @click="doubleFunction">
+                    <img class="modifyIcon" src="../assets/edit-regular.svg"/>
+                </button>
+                <button title="Supprimer commentaire" id="deleteButton" @click="deleteComment(commentData.id)">X</button>
+            </div>
         </div>
-        {{ commentData.text }}
-        <img class="commentImage" :src="commentData.imageUrl"/>
+        <div id="text">
+            {{ commentData.text }}
+        </div>
+        <img v-if="commentData.imageUrl" class="commentImage" :src="commentData.imageUrl"/>
     </div>
 
+    <!-- Modification du commentaire -->
     <div id="modifyCommentDialog" v-if="isModifyCommentDialogOpened">
         <div id="modifyTop">
             <label for="post">Que voulez-vous modifier ?</label>
             <button title="Annuler" id="cancelButton" @click="doubleFunction">X</button>
         </div>
         <textarea id="comment_text_modify" name="commentName_modify" rows="2" cols="35" v-model="text"></textarea>
-        <img class="commentImage" :src="commentData.imageUrl"/>
+        <img v-if="commentData.imageUrl" class="commentImage" :src="commentData.imageUrl"/>
+        <div id="alertCommentModify" v-if="alertComment">
+            Veuillez ajouter du texte ou une image
+        </div>
         <input type="file" id="comment_imageUrl_modify" name="imageUrl_modify" @change="uploadFile($event)">
-        <label for="comment_imageUrl_modify" id="comment_imageUrl_modify_label">Ajouter un fichier...</label>
+        <label for="comment_imageUrl_modify" id="comment_imageUrl_modify_label" :value="commentData.imageUrl">Ajouter un fichier...</label>
         <button id="modifyingButton" @click="sendModifiedComment(commentData.id)">Envoyer</button>
     </div>
 </template>
@@ -30,6 +44,7 @@
 <script>
 // import PostBody from './PostBody.vue'
 import { mapState } from 'vuex'
+import formatDateMixin from '../mixins/formatDateMixin.js'
 
 export default {
     name: 'Comment',
@@ -40,14 +55,24 @@ export default {
         this.getUserInfo(this.commentData.user_id)
     },
     computed: {
-        ...mapState(['pseudo', 'posts'])
+        ...mapState({
+            pseudo: state => state.pseudo,
+            isAdmin: state => state.isAdmin,
+            posts: state => state.posts
+        }),
+        formattedDate() {
+            return this.formatDate(this.commentData.createdAt)
+        }
     },
     data: () => ({
         isModifyCommentDialogOpened: false,
         isCommentOpened: true,
         commentAuthor: null,
-        commentAuthorImageUrl: null
+        commentAuthorImageUrl: null,
+        alertComment: false,
+        text: ''
     }),
+    mixins: [formatDateMixin],
     methods: {
         uploadFile(event) {
             console.log(event.target.files)
@@ -67,13 +92,19 @@ export default {
             this.$store.dispatch('deleteComment', id)
         },
         sendModifiedComment(id) {
+
+            if((this.text === undefined || this.text === "") && this.imageUrl === undefined) {
+                return this.alertComment = true
+            } else {
+                this.alertComment = false
+            }
+
             let formData = new FormData()
             formData.append('text', this.text)
             formData.append('imageUrl', this.imageUrl)
             formData.append('userId', this.userId)
 
             this.$store.dispatch('modifyComment', { id, formData })
-            document.getElementById('comment_text_modify').value = ""
         },
         getUserInfo(user_id) {
 
@@ -113,27 +144,42 @@ export default {
         color: #212E53;
         font-size: 1.2em;
     }
-    #commentBody {
+    #userComment {
         width: 100%;
-        margin: 0.5rem 0 1rem 0;
+        margin: 0.5rem 0 0.5rem 0;
         display: flex;
-        justify-content: space-around;
         align-items: center;
     }
     #userImageContainer {
-        width: 55px;
-        height: 55px;
+        width: 65px;
+        height: 65px;
         border-radius: 50%;
         border: solid 1px rgb(182, 182, 182);
         text-align: center;
         overflow: hidden;
+        position: relative;
+        left: 10px;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
     }
-    #userImage {
-        object-fit: contain;
-        max-width: 100%;
+    #user {
+        position: relative;
+        left: 15px;
+        top: -15px;
+    }
+    #date {
+        font-size: 0.5em;
+    }
+    #userButtons {
+        width: 10%;
+        position: relative;
+        right: 52px;
+        top: 10px;
     }
     #modifyCommentButton {
-        width: 4%;
+        width: 16px;
+        margin-right: 0.1rem;
         border: none;
         outline: none;
         background: none;
@@ -149,6 +195,10 @@ export default {
         outline: none;
         border: none;
         cursor: pointer;
+    }
+    #text {
+        text-align: center;
+        margin: 0 0.5rem 1rem 0.5rem;
     }
     .commentImage {
         width: 80%;
@@ -225,5 +275,11 @@ export default {
         outline: none;
         border: none;
         cursor: pointer;
+    }
+    #alertCommentModify {
+        background: rgba(255, 0, 0, 0.2);
+        padding: 0.2rem;
+        margin-top: 1rem;
+        font-size: 0.9em;
     }
 </style>

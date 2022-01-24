@@ -1,23 +1,33 @@
 <template>
     <div id="post" v-if="isPostOpened">
-        <div id="bodyPost">
-            <div id="userImageContainer">
-                <img id="userImage" :src="postData.user.imageUrl"/>
+        <div id="userPost">
+            <div id="userImageContainer" :style="{ backgroundImage: 'url(' + postData.user.imageUrl + ')' }"></div>
+            <div id="user">
+                <div id="pseudo">
+                    {{ postData.user.pseudo }}
+                </div>
+                <div id="date">
+                    {{ formattedDate }}
+                </div>
             </div>
-            {{ postData.user.pseudo }}
-            {{ postData.createdAt }}
-            <button v-if="pseudo === postData.user.pseudo || isAdmin === 1" title="Modifier" id="modifyButton" @click="doubleFunction"><img class="modifyIcon" src="../assets/edit-regular.svg"/></button>
-            <button v-if="pseudo === postData.user.pseudo || isAdmin === 1" id="deleteButton" title="Supprimer" @click="deletePost(postData.id)">X</button>
+            <div id="userButtons" v-if="pseudo === postData.user.pseudo || isAdmin === 1">
+                <button title="Modifier" id="modifyButton" @click="doubleFunction">
+                    <img class="modifyIcon" src="../assets/edit-regular.svg"/>
+                </button>
+                <button id="deleteButton" title="Supprimer" @click="deletePost(postData.id)">X</button>
+            </div>
         </div>
-        {{ postData.text }}
-        <img class="postImage" :src="postData.imageUrl"/>
+        <div id="text">
+            {{ postData.text }}
+        </div>
+        <img v-if="postData.imageUrl" class="postImage" :src="postData.imageUrl"/>
         <div id="buttons">
             <div id="likesButton">
                 <button class="interactionButton" @click="clickLike(this.postData.id, this.userId)">J'aime</button>
                 <p id="likesNumber">{{ postData.likes.length }}</p>
             </div>
             <button class="interactionButton" @click="showCommentDialog">Commenter</button>
-            <button class="interactionButton" @click="showComments">Afficher les commentaires({{ postData.comments.length }})</button>
+            <button id="showCommentsButton" class="interactionButton" @click="showComments">Afficher les commentaires({{ postData.comments.length }})</button>
         </div>
     </div>
     <ul id="commentsList" v-if="isCommentsVisible">
@@ -37,7 +47,9 @@
         <img class="postImage" :src="postData.imageUrl"/>
         <input type="file" id="post_imageUrl_modify" name="imageUrl_modify" @change="uploadFile($event)">
         <label for="post_imageUrl_modify" id="post_imageUrl_modify_label">Ajouter un fichier...</label>
-        <div id="alertPostModify" v-if="alertPost">Veuillez ajouter du texte ou une image</div>
+        <div id="alertPost" v-if="alertPost">
+            Veuillez ajouter du texte ou une image
+        </div>
         <button id="modifyingButton" @click="sendModifiedPost(postData.id)">Envoyer</button>
     </div>
 
@@ -47,7 +59,9 @@
         <div id="separation"></div>
         <label for="comment">Ecrire un commentaire...</label>
         <textarea id="comment_text" name="commentName" rows="2" cols="35" v-model="text"></textarea>
-        <div id="alertPost" v-if="alertPost">Veuillez ajouter du texte ou une image</div>
+        <div id="alertComment" v-if="alertComment">
+            Veuillez ajouter du texte ou une image
+        </div>
         <div id="commentButtons">
             <input type="file" id="comment_imageUrl" name="imageUrl" @change="uploadFile($event)">
             <label for="comment_imageUrl" id="comment_imageUrl_label">Ajouter un fichier...</label>
@@ -61,6 +75,7 @@
 
 import { mapState } from 'vuex'
 import Comment from './Comment.vue'
+import formatDateMixin from '../mixins/formatDateMixin.js'
 
 export default {
     name: 'Post',
@@ -71,20 +86,25 @@ export default {
         'postData'
     ],
     computed: {
-        ...mapState(['pseudo', 'userId'])
-        // ...mapState({
-        //     pseudo: state => state.pseudo,
-        //     userId: state => state.userId,
-        //     text: state => state.postData.text
-        // })
+        ...mapState({
+            pseudo: state => state.pseudo,
+            isAdmin: state => state.isAdmin,
+            userId: state => state.userId
+        }),
+        formattedDate() {
+            return this.formatDate(this.postData.createdAt)
+        }
     },
     data: () => ({
         isCommentDialogOpened: false,
         isCommentsVisible: false,
         isModifyDialogOpened: false,
         isPostOpened: true,
-        alertPost: false
+        alertPost: false,
+        alertComment: false,
+        text: ''
     }),
+    mixins: [formatDateMixin],
     methods: {
         doubleFunction() {
             this.postOpened(),
@@ -103,9 +123,9 @@ export default {
         sendComment(id) {
 
             if((this.text === undefined || this.text === "") && this.imageUrl === undefined) {
-                return this.alertPost = true
+                return this.alertComment = true
             } else {
-                this.alertPost = false
+                this.alertComment = false
             }
 
             let formData = new FormData()
@@ -119,6 +139,7 @@ export default {
             this.$store.dispatch('createComment', formData)
             document.getElementById('comment_text').value =""
             this.isCommentsVisible = true
+            this.isCommentDialogOpened = false
         },
         // updatePostText(event) {
         //     this.$store.commit('UPDATE_POST_TEXT', event.target.value)
@@ -176,13 +197,12 @@ export default {
 <style scoped lang="scss">
     #post {
         background: #fcfcfc;
-        width: 65%;
+        width: 85%;
         border-radius: 15px;
         margin-top: 2.5rem;
         margin-left: auto;
         margin-right: auto;
         display: flex;
-        justify-content: center;
         align-items: center;
         flex-direction: column;
         font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -190,24 +210,38 @@ export default {
         color: #212E53;
         font-size: 1.2em;
     }
+    #userPost {
+        width: 100%;
+        margin: 0.5rem 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+    }
     #userImageContainer {
-        width: 55px;
-        height: 55px;
+        width: 65px;
+        height: 65px;
         border-radius: 50%;
         border: solid 1px rgb(182, 182, 182);
         text-align: center;
         overflow: hidden;
+        position: relative;
+        left: 10px;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
     }
-    #userImage {
-        object-fit: contain;
-        max-width: 100%;
+    #user {
+        position: relative;
+        left: 15px;
+        top: -15px;
     }
-    #bodyPost {
-        width: 100%;
-        margin: 0.5rem 0 1rem 0;
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
+    #date {
+        font-size: 0.5em;
+    }
+    #userButtons {
+        width: 10%;
+        position: relative;
+        right: 52px;
+        top: 10px;
     }
     #deleteButton {
         color: #A7001E;
@@ -218,7 +252,8 @@ export default {
         cursor: pointer;
     }
     #modifyButton {
-        width: 3.5%;
+        width: 16px;
+        margin-right: 0.1rem;
         background: none;
         outline: none;
         border: none;
@@ -227,12 +262,17 @@ export default {
     .modifyIcon {
         width: 100%;
     }
+    #text {
+        text-align: center;
+        margin: 0 0.5rem;
+    }
     #buttons {
         width: 100%;
         display: flex;
         justify-content: space-around;
         padding: 1rem 0;
         margin-top: 1rem;
+        flex-wrap: wrap;
     }
     #likesButton {
         display: flex;
@@ -241,7 +281,7 @@ export default {
         margin: auto 0.4rem;
     }
     .postImage {
-        max-width: 80%;
+        max-width: 90%;
         margin-top: 1rem;
     }
     .interactionButton {
@@ -256,7 +296,7 @@ export default {
         border-radius: 15px;
     }
     #commentsList {
-        width: 60%;
+        width: 80%;
         margin: 0 auto;
         background: #fcfcfc;
         border-radius: 0 0 15px 15px;
@@ -272,7 +312,7 @@ export default {
     }
     #modifyPostDialog {
         background: #fcfcfc;
-        width: 65%;
+        width: 85%;
         border-radius: 15px;
         margin-top: 2.5rem;
         margin-left: auto;
@@ -306,7 +346,7 @@ export default {
             color: #212E53;
         }
     }
-    #alertPostModify {
+    #alertPost {
         background: rgba(255, 0, 0, 0.2);
         padding: 0.2rem;
         margin-bottom: 1rem;
@@ -347,7 +387,7 @@ export default {
     // création de commentaire ----------------------------------------------------------------------------------------
     #commentCreation {
         background: #fcfcfc;
-        width: 60%;
+        width: 80%;
         margin: auto;
         border-radius: 0 0 15px 15px;
         color: #212E53;
@@ -394,7 +434,7 @@ export default {
         cursor: pointer;
         padding: 0.7rem 0.5rem;
     }
-    #alertPost {
+    #alertComment {
         background: rgba(255, 0, 0, 0.2);
         padding: 0.2rem;
         margin-top: 1rem;
@@ -420,4 +460,9 @@ export default {
             color: #212E53;
         }
     }
+    // @media (max-width: 550px) {
+    //     #buttons {
+    //         flex-wrap: wrap;
+    //     }
+    // }
 </style>
