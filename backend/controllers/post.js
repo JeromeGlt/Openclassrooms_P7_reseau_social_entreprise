@@ -10,6 +10,14 @@ exports.getAllPosts = (req, res, next) => {
         .catch(error => res.status(400).json({ error }))
 }
 
+exports.getOnePost = (req, res, next) => {
+    Post.findOne({ where : { id : req.params.id }})
+        .then(post => {
+            res.status(201).json({ post })
+        })
+        .catch((error) => res.status(500).json(error))
+}
+
 exports.createPost = (req, res, next) => {
     console.log(req.body)
 

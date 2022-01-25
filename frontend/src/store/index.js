@@ -13,7 +13,8 @@ const store = createStore({
         token: '',
         isAdmin: '',
         message: '',
-        posts: [],
+        posts: []
+        // post: {}
     },
     getters: {
     },
@@ -46,6 +47,9 @@ const store = createStore({
         SET_POST (state, data) {
             state.posts = data
         },
+        // SET_UNIQUE_POST (state, data) {
+        //     state.post = data
+        // },
         UPDATE_EMAIL (state, email) {
             state.email = email
         },
@@ -54,7 +58,7 @@ const store = createStore({
         }
     },
     actions: {
-        // Cinq actions concernant les utilisateurs - Signup, Login, Get, Delete et Modify
+        // Six actions concernant les utilisateurs - Signup, Login, Get x2, Delete et Modify
         submitSignup({ commit }, formData) {
             console.log(formData)
             fetch('http://localhost:3000/api/auth/signup', {
@@ -156,7 +160,7 @@ const store = createStore({
                 .then(data => dispatch('getUserDatas', data))
                 .catch(err => console.log(err))
         },
-        // Quatre actions concernant les publications - Create, Delete, Get et Put
+        // Cinq actions concernant les publications - Create, Delete, Get x2 et Put
         createPost({ dispatch }, formData) {
 
             let storageToken = localStorage.getItem('token')
@@ -222,7 +226,24 @@ const store = createStore({
                 .then(data => commit('SET_POST', data))
                 .catch(err => console.log(err))
         },
-        // Quatre actions concernant les commentaires - Create, Delete, Get et Modify
+        // getOnePost({ commit }, id) {
+
+        //     let storageToken = localStorage.getItem('token')
+
+        //     fetch('http://localhost:3000/api/posts/post/' + id, {
+        //         headers: {
+        //             'Accept': 'application/json',
+        //             'Authorization': 'Bearer ' + storageToken
+        //         }
+        //     })
+        //         .then(res => res.json())
+        //         .then(data => {
+        //             commit('SET_UNIQUE_POST', data),
+        //             console.log(data)
+        //         })
+        //         .catch(err => console.log(err))
+        // },
+        // Trois actions concernant les commentaires - Create, Delete et Modify
         createComment({ dispatch }, formData) {
             
             let storageToken = localStorage.getItem('token')
@@ -274,6 +295,7 @@ const store = createStore({
                 })
                 .catch(err => console.log(err))
         },
+        // Deux actions concernant les likes - Create et Delete
         createLike({ dispatch }, bodyLike) {
 
             let storageToken = localStorage.getItem('token')

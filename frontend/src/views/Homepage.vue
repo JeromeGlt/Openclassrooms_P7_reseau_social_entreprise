@@ -5,7 +5,7 @@
         <p>{{ pseudo }},</p>
         <label for="post">que voulez-vous partager aujourd'hui ?</label>
         <div id="text_image">
-            <textarea id="post_text" name="postText" rows="3" cols="50" v-model="text"></textarea>
+            <textarea name="postText" rows="3" cols="50" v-model="text"></textarea>
             <input type="file" id="post_imageUrl" name="imageUrl" @change="uploadFile($event)">
             <label for="post_imageUrl" id="post_imageUrl_label">Ajouter un fichier...</label>
         </div>
@@ -22,8 +22,7 @@
 </template>
 
 <script>
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
+
 import { mapState } from 'vuex'
 import Post from '../components/Post.vue'
 
@@ -69,15 +68,10 @@ export default {
             localStorage.clear()
         }
     },
-    beforeMount() {
+    mounted() {
         this.getUserDatas(),
         this.loadAllPosts()
     }
-    // mounted() {
-    //     this.getUserDatas(),
-    //     this.loadAllPosts()
-    //     console.log('test')
-    // }
 }
 </script>
 
@@ -97,7 +91,6 @@ export default {
         font-size: 1.2em;
         display: flex;
         align-items: center;
-        justify-content: center;
         flex-direction: column;
         padding: 1rem 0 1rem 0;
         margin: 1rem 0 1.5rem 0;
@@ -109,10 +102,12 @@ export default {
         margin-top: 1.5rem;
     }
     textarea {
+        max-width: 90%;
         border-radius: 10px;
         background: #E8F0FE;
         text-align: center;
         font-size: 1.2em;
+        margin: 0 auto;
     }
     #post_imageUrl {
         width: 0.1px;
@@ -123,11 +118,12 @@ export default {
         z-index: -1;
     }
     #post_imageUrl_label {
+        max-width: 90%;
         color: #212E53;
         background: #E8F0FE;
         font-size: 0.8em;
         font-weight: bold;
-        margin: 15px 0 20px 0;
+        margin: 15px auto;
         border-radius: 5px;
         cursor: pointer;
         padding: 0.7em 0.5em;

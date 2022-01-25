@@ -176,6 +176,8 @@ export default {
         position: relative;
         right: 52px;
         top: 10px;
+        display: flex;
+        flex-wrap: nowrap;
     }
     #modifyCommentButton {
         width: 16px;
@@ -244,6 +246,7 @@ export default {
         }
     }
     #comment_text_modify {
+        max-width: 90%;
         border-radius: 10px;
         background: #E8F0FE;
         text-align: center;

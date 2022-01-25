@@ -1,5 +1,5 @@
 <template>
-    <div id="post" v-if="isPostOpened">
+    <div id="post" v-if="isPostOpened" @click="routerPost(postData.id)">
         <div id="userPost">
             <div id="userImageContainer" :style="{ backgroundImage: 'url(' + postData.user.imageUrl + ')' }"></div>
             <div id="user">
@@ -12,7 +12,7 @@
             </div>
             <div id="userButtons" v-if="pseudo === postData.user.pseudo || isAdmin === 1">
                 <button title="Modifier" id="modifyButton" @click="doubleFunction">
-                    <img class="modifyIcon" src="../assets/edit-regular.svg"/>
+                    <img id="modifyIcon" src="../assets/edit-regular.svg"/>
                 </button>
                 <button id="deleteButton" title="Supprimer" @click="deletePost(postData.id)">X</button>
             </div>
@@ -76,6 +76,7 @@
 import { mapState } from 'vuex'
 import Comment from './Comment.vue'
 import formatDateMixin from '../mixins/formatDateMixin.js'
+import router from '../router/index.js'
 
 export default {
     name: 'Post',
@@ -106,6 +107,9 @@ export default {
     }),
     mixins: [formatDateMixin],
     methods: {
+        routerPost(id) {
+            router.push('/posts/post/' + id)
+        },
         doubleFunction() {
             this.postOpened(),
             this.showModifyDialog()
@@ -137,7 +141,6 @@ export default {
             console.log(formData)
 
             this.$store.dispatch('createComment', formData)
-            document.getElementById('comment_text').value =""
             this.isCommentsVisible = true
             this.isCommentDialogOpened = false
         },
@@ -187,7 +190,6 @@ export default {
             formData.append('userId', this.userId)
 
             this.$store.dispatch('modifyPost', { id, formData })
-            document.getElementById('post_text_modify').value = ""
         }
     }
 }
@@ -209,6 +211,7 @@ export default {
         box-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
         color: #212E53;
         font-size: 1.2em;
+        cursor: pointer;
     }
     #userPost {
         width: 100%;
@@ -242,6 +245,8 @@ export default {
         position: relative;
         right: 52px;
         top: 10px;
+        display: flex;
+        flex-wrap: nowrap;
     }
     #deleteButton {
         color: #A7001E;
@@ -259,7 +264,7 @@ export default {
         border: none;
         cursor: pointer;
     }
-    .modifyIcon {
+    #modifyIcon {
         width: 100%;
     }
     #text {
@@ -282,6 +287,7 @@ export default {
     }
     .postImage {
         max-width: 90%;
+        max-height: 20rem;
         margin-top: 1rem;
     }
     .interactionButton {
@@ -352,6 +358,7 @@ export default {
         margin-bottom: 1rem;
     }
     #post_text_modify {
+        max-width: 90%;
         border-radius: 10px;
         background: #E8F0FE;
         text-align: center;
@@ -460,9 +467,4 @@ export default {
             color: #212E53;
         }
     }
-    // @media (max-width: 550px) {
-    //     #buttons {
-    //         flex-wrap: wrap;
-    //     }
-    // }
 </style>
