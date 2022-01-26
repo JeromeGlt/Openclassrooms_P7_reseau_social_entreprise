@@ -3,8 +3,7 @@ const sequelize = require('../utils/dataBase')
 const User = require('./user')
 const Post = require('./post')
 
-const Like = sequelize.define("like", {
-})
+const Like = sequelize.define("like", {})
 
 User.hasMany(Like, {
     ondelete: 'cascade',

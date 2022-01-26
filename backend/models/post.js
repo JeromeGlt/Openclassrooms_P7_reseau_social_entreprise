@@ -13,8 +13,6 @@ const Post = sequelize.define("post", {
     }
 })
 
-// date et id sont automatiques
-
 User.hasMany(Post, {
     ondelete: 'cascade',
     foreignKey: {

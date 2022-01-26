@@ -1,8 +1,6 @@
 import { createStore } from 'vuex'
 import router from '../router/index.js'
 
-// import { SET_NOTE } from '@/store/mutation-types'
-
 const store = createStore({
     state: {
         pseudo: '',
@@ -14,9 +12,6 @@ const store = createStore({
         isAdmin: '',
         message: '',
         posts: []
-        // post: {}
-    },
-    getters: {
     },
     mutations: {
         SIGNUP (state, data) {
@@ -47,9 +42,6 @@ const store = createStore({
         SET_POST (state, data) {
             state.posts = data
         },
-        // SET_UNIQUE_POST (state, data) {
-        //     state.post = data
-        // },
         UPDATE_EMAIL (state, email) {
             state.email = email
         },
@@ -58,9 +50,9 @@ const store = createStore({
         }
     },
     actions: {
-        // Six actions concernant les utilisateurs - Signup, Login, Get x2, Delete et Modify
+        // Six actions concernant les utilisateurs - Post signup, Post login, Delete, Get et Put (pour l'email et pour l'image)
         submitSignup({ commit }, formData) {
-            console.log(formData)
+
             fetch('http://localhost:3000/api/auth/signup', {
                 method: 'post',
                 headers: {
@@ -68,18 +60,18 @@ const store = createStore({
                 },
                 body: formData
             })
-                .then(res => res.json())
-                .then(data => {
-                    commit('SIGNUP', data)
-                    if(!data.message) {
-                        router.push('/posts')
-                    }
-                    localStorage.setItem('token', data.token)
-                })
-                .catch(err => console.log(err))
+            .then(res => res.json())
+            .then(data => {
+                commit('SIGNUP', data)
+                if(!data.message) {
+                    router.push('/posts')
+                }
+                localStorage.setItem('token', data.token)
+            })
+            .catch(err => console.log(err))
         },
         submitLogin({ commit }, loginData) {
-            console.log(loginData)
+
             fetch('http://localhost:3000/api/auth/login', {
                 method: 'post',
                 headers: {
@@ -109,23 +101,23 @@ const store = createStore({
                     'Authorization': 'Bearer ' + storageToken
                 }
             })
-                .then(res => res.json())
-                .then(data => console.log(data))
-                .catch(err => console.log(err, 'erreur dans la fonction deleteUser'))
+            .then(res => res.json())
+            .then(data => console.log(data))
+            .catch(err => console.log(err))
         },
         getUserDatas({ commit }) {
 
             let storageToken = localStorage.getItem('token')
 
             fetch('http://localhost:3000/api/posts/getId', {
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': 'Bearer ' + storageToken
-            }
-        })
-                .then(res => res.json())
-                .then(data => commit('GET_USER_ID', data))
-                .catch(err => console.log(err))
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + storageToken
+                }
+            })
+            .then(res => res.json())
+            .then(data => commit('GET_USER_ID', data))
+            .catch(err => console.log(err))
         },
         modifyImageProfile({ dispatch }, { bodyProfile, userId }) {
 
@@ -139,9 +131,9 @@ const store = createStore({
                 },
                 body: bodyProfile
             })
-                .then(res => res.json())
-                .then(data => dispatch('getUserDatas', data))
-                .catch(err => console.log(err))
+            .then(res => res.json())
+            .then(data => dispatch('getUserDatas', data))
+            .catch(err => console.log(err))
         },
         modifyEmailProfile({ dispatch }, { bodyProfile, userId }) {
 
@@ -156,11 +148,11 @@ const store = createStore({
                 },
                 body: JSON.stringify(bodyProfile)
             })
-                .then(res => res.json())
-                .then(data => dispatch('getUserDatas', data))
-                .catch(err => console.log(err))
+            .then(res => res.json())
+            .then(data => dispatch('getUserDatas', data))
+            .catch(err => console.log(err))
         },
-        // Cinq actions concernant les publications - Create, Delete, Get x2 et Put
+        // Quatre actions concernant les publications - Post, Put, Delete et Get
         createPost({ dispatch }, formData) {
 
             let storageToken = localStorage.getItem('token')
@@ -174,10 +166,10 @@ const store = createStore({
                 },
                 body: formData
             })
-                .then(() => {
-                    dispatch('loadAllPosts')
-                })
-                .catch(err => console.log(err))
+            .then(() => {
+                dispatch('loadAllPosts')
+            })
+            .catch(err => console.log(err))
         },
         modifyPost({ dispatch }, { id, formData }) {
 
@@ -191,10 +183,10 @@ const store = createStore({
                 },
                 body: formData
             })
-                .then(() => {
-                    dispatch('loadAllPosts')
-                })
-                .catch(err => console.log(err))
+            .then(() => {
+                dispatch('loadAllPosts')
+            })
+            .catch(err => console.log(err))
         },
         deletePost({ dispatch }, id) {
 
@@ -207,10 +199,10 @@ const store = createStore({
                     'Authorization': 'Bearer ' + storageToken
                 }
             })
-                .then(() => {
-                    dispatch('loadAllPosts')
-                })
-                .catch(err => console.log(err))
+            .then(() => {
+                dispatch('loadAllPosts')
+            })
+            .catch(err => console.log(err))
         },
         loadAllPosts({ commit }) {
 
@@ -222,33 +214,15 @@ const store = createStore({
                     'Authorization': 'Bearer ' + storageToken
                 }
             })
-                .then(res => res.json())
-                .then(data => commit('SET_POST', data))
-                .catch(err => console.log(err))
+            .then(res => res.json())
+            .then(data => commit('SET_POST', data))
+            .catch(err => console.log(err))
         },
-        // getOnePost({ commit }, id) {
-
-        //     let storageToken = localStorage.getItem('token')
-
-        //     fetch('http://localhost:3000/api/posts/post/' + id, {
-        //         headers: {
-        //             'Accept': 'application/json',
-        //             'Authorization': 'Bearer ' + storageToken
-        //         }
-        //     })
-        //         .then(res => res.json())
-        //         .then(data => {
-        //             commit('SET_UNIQUE_POST', data),
-        //             console.log(data)
-        //         })
-        //         .catch(err => console.log(err))
-        // },
-        // Trois actions concernant les commentaires - Create, Delete et Modify
+        // Trois actions concernant les commentaires - Post, Put et Delete
         createComment({ dispatch }, formData) {
             
             let storageToken = localStorage.getItem('token')
 
-            console.log(formData)
             fetch('http://localhost:3000/api/posts/comments', {
                 method: 'post',
                 headers: {
@@ -257,10 +231,10 @@ const store = createStore({
                 },
                 body: formData
             })
-                .then(() => {
-                    dispatch('loadAllPosts')
-                })
-                .catch(err => console.log(err))
+            .then(() => {
+                dispatch('loadAllPosts')
+            })
+            .catch(err => console.log(err))
         },
         modifyComment({ dispatch }, { id, formData }) {
 
@@ -274,10 +248,10 @@ const store = createStore({
                 },
                 body: formData
             })
-                .then(() => {
-                    dispatch('loadAllPosts')
-                })
-                .catch(err => console.log(err))
+            .then(() => {
+                dispatch('loadAllPosts')
+            })
+            .catch(err => console.log(err))
         },
         deleteComment({ dispatch }, id) {
 
@@ -290,12 +264,12 @@ const store = createStore({
                         'Authorization': 'Bearer ' + storageToken
                 }
             })
-                .then(() => {
-                    dispatch('loadAllPosts')
-                })
-                .catch(err => console.log(err))
+            .then(() => {
+                dispatch('loadAllPosts')
+            })
+            .catch(err => console.log(err))
         },
-        // Deux actions concernant les likes - Create et Delete
+        // Deux actions concernant les likes - Post et Delete
         createLike({ dispatch }, bodyLike) {
 
             let storageToken = localStorage.getItem('token')
@@ -325,10 +299,10 @@ const store = createStore({
                         'Authorization': 'Bearer ' + storageToken
                 }
             })
-                .then(() => {
-                    dispatch('loadAllPosts')
-                })
-                .catch(err => console.log(err))
+            .then(() => {
+                dispatch('loadAllPosts')
+            })
+            .catch(err => console.log(err))
         }
     }
 })

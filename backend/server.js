@@ -14,7 +14,7 @@ const normalizePort = val => {
     return false
 }
 
-const port = normalizePort(process.env.PORT || '3000')
+const port = normalizePort('3000')
 
 try {
     sequelize.authenticate()
@@ -55,14 +55,8 @@ server.on('listening', () => {
     console.log('Listening on ' + bind)
 })
 
-sequelize.sync({force: true})
+sequelize.sync()
     .then(() => {
         server.listen(port)
     })
     .catch((error) => console.log(error))
-
-// sequelize.sync()
-//     .then(() => {
-//         server.listen(port)
-//     })
-//     .catch((error) => console.log(error))

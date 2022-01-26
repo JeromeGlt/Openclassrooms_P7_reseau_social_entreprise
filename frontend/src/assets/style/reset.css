@@ -6,3 +6,148 @@
 a {
     text-decoration: none;
 }
+#app {
+    background: #E2E9C0;
+    min-height: 100vh;
+}
+.separation {
+    width: 50%;
+    height: 1px;
+    background: rgb(182, 182, 182);
+    margin-bottom: 0.8rem;
+}
+.basics {
+    background: #fcfcfc;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    color: #212E53;
+    font-size: 1.2em;
+}
+.userComponents {
+    width: 100%;
+    margin: 0.5rem 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+}
+.userImageContainer {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    border: solid 1px rgb(182, 182, 182);
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+    left: 10px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.user {
+    position: relative;
+    left: 15px;
+    top: -15px;
+}
+.date {
+    font-size: 0.5em;
+}
+.userButtons {
+    width: 10%;
+    position: relative;
+    right: 52px;
+    top: 10px;
+    display: flex;
+    flex-wrap: nowrap;
+}
+.cursor {
+    cursor: pointer;
+}
+.modifyButton {
+    width: 16px;
+    margin-right: 0.1rem;
+    border: none;
+    outline: none;
+    background: none;
+}
+.modifyIcon {
+    width: 100%;
+}
+.deleteButton {
+    color: #A7001E;
+    font-size: 1em;
+    background: none;
+    outline: none;
+    border: none;
+}
+.interactionButton {
+    background: #E8F0FE;
+    color: #212E53;
+    border: none;
+    outline: none;
+    font-size: 0.8em;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    padding: 0.5rem;
+    border-radius: 15px;
+}
+.input_hidden {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+.background_alert {
+    background: rgba(255, 0, 0, 0.2);
+}
+.imageUrl_label {
+    color: #212E53;
+    background: #E8F0FE;
+    font-size: 0.8em;
+    font-weight: bold;
+    margin: 1rem 0 1rem 0;
+    border-radius: 5px;
+    padding: 0.7rem 0.5rem;
+}
+.basics_buttons {
+    transition: .2s ease-in;
+    border-radius: 5px;
+    font-weight: bold;
+    outline: none;
+    border: none;
+    font-size: 1em;
+    color: #fff;
+    text-align: center;
+    background: #212E53;
+}
+.modifyTop {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1rem;
+}
+.text_modify {
+    max-width: 90%;
+    border-radius: 10px;
+    background: #E8F0FE;
+    text-align: center;
+    font-size: 1.2em;
+    margin: 1rem 0;
+}
+.cancelButton {
+    color: #A7001E;
+    font-size: 1em;
+    background: none;
+    outline: none;
+    border: none;
+}
+.modifyProfileButton {
+    border: none;
+    outline: none;
+    background: none;
+    position: relative;
+}
+.box_shadow {
+    box-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
+}

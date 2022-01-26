@@ -27,6 +27,3 @@ app.use('/api/posts', likeRoutes)
 app.use('/api/posts/getId', refreshRoutes)
 
 module.exports = app
-
-//Sequelize fait référence à la bibliothèque elle-même
-//sequelize (sans maj) fait référence à une instance de Sequelize (avec maj)

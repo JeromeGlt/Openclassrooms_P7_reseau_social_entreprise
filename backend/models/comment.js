@@ -14,8 +14,6 @@ const Comment = sequelize.define("comment", {
     }
 })
 
-// date et id sont automatiques
-
 User.hasMany(Comment, {
     ondelete: 'cascade',
     foreignKey: {

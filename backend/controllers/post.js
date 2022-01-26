@@ -6,20 +6,19 @@ const fs = require('fs')
 
 exports.getAllPosts = (req, res, next) => {
     Post.findAll({ include : [Comment, Like, User] })
-        .then(posts => res.status(200).json(posts))
-        .catch(error => res.status(400).json({ error }))
+    .then(posts => res.status(200).json(posts))
+    .catch(error => res.status(400).json({ error }))
 }
 
 exports.getOnePost = (req, res, next) => {
     Post.findOne({ where : { id : req.params.id }})
-        .then(post => {
-            res.status(201).json({ post })
-        })
-        .catch((error) => res.status(500).json(error))
+    .then(post => {
+        res.status(201).json({ post })
+    })
+    .catch((error) => res.status(500).json(error))
 }
 
 exports.createPost = (req, res, next) => {
-    console.log(req.body)
 
     if(req.body.text === 'undefined') {
         req.body.text = null
@@ -31,14 +30,13 @@ exports.createPost = (req, res, next) => {
         imageUrl: req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null,
         user_id: +req.body.userId
     })
-        .then(post => {
-            res.status(201).json({ post })
-        })
-        .catch(() => res.status(500).json({ message : 'erreur dans la création du post' }))
+    .then(post => {
+        res.status(201).json({ post })
+    })
+    .catch((error) => res.status(500).json(error))
 }
 
 exports.modifyPost = (req, res, next) => {
-    console.log(req.body)
 
     if(req.body.text === 'undefined') {
         req.body.text = null
@@ -52,26 +50,25 @@ exports.modifyPost = (req, res, next) => {
         imageUrl: null
     }
     Post.update({ ...postObject }, { where :  { id : req.params.id }})
-        .then(() => res.status(200).json({ message : 'Post modifié' }))
-        .catch(() => res.status(500).json({ message : 'Erreur dans update' }))
+    .then(() => res.status(200).json({ message : 'Post modifié' }))
+    .catch((error) => res.status(500).json(error))
 }
 
 exports.deletePost = (req, res, next) => {
-    console.log(req.params.id)
     Post.findOne({ where : { id : req.params.id }})
-        .then(post => {
-            if(req.file) {
-                const filename = post.imageUrl.split('/images/')[1]
-                fs.unlink(`images/${filename}`, () => {
-                    Post.destroy({ where : { id : req.params.id }})
-                        .then(() => res.status(200).json({ message : 'Post supprimé !' }))
-                        .catch(() => res.status(500).json({ message : 'Suppression impossible' }))
-                })
-            } else {
+    .then(post => {
+        if(req.file) {
+            const filename = post.imageUrl.split('/images/')[1]
+            fs.unlink(`images/${filename}`, () => {
                 Post.destroy({ where : { id : req.params.id }})
-                    .then(() => res.status(200).json({ message : 'Post supprimé !' }))
-                    .catch(() => res.status(500).json({ message : 'Suppression impossible' }))
-            }
-        })
-        .catch((e) => res.status(500).json(e))
+                .then(() => res.status(200).json({ message : 'Post supprimé !' }))
+                .catch(() => res.status(500).json({ message : 'Suppression impossible' }))
+            })
+        } else {
+            Post.destroy({ where : { id : req.params.id }})
+            .then(() => res.status(200).json({ message : 'Post supprimé !' }))
+            .catch(() => res.status(500).json({ message : 'Suppression impossible' }))
+        }
+    })
+    .catch((error) => res.status(500).json(error))
 }
