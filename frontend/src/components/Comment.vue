@@ -1,43 +1,45 @@
 <template>
-    <div id="comment" class="basics" v-if="isCommentOpened">
-        <div class="separation"></div>
-        <div class="userComponents">
-            <div class="userImageContainer" :style="{ backgroundImage: 'url(' + commentAuthorImageUrl + ')' }"></div>
-            <div class="user">
-                <div v-if="commentAuthor">
-                    {{ commentAuthor }}
+    <div>
+        <div id="comment" class="basics" v-if="isCommentOpened">
+            <div class="separation"></div>
+            <div class="userComponents">
+                <div class="userImageContainer" :style="{ backgroundImage: 'url(' + commentAuthorImageUrl + ')' }"></div>
+                <div class="user">
+                    <div v-if="commentAuthor">
+                        {{ commentAuthor }}
+                    </div>
+                    <div class="date">
+                        {{ formattedDate }}
+                    </div>
                 </div>
-                <div class="date">
-                    {{ formattedDate }}
+                <div class="userButtons" v-if="pseudo === commentAuthor || isAdmin === true">
+                    <button title="Modifier commentaire" class="modifyButton cursor" @click="doubleFunction">
+                        <img class="modifyIcon" src="../assets/edit-regular.svg"/>
+                    </button>
+                    <button title="Supprimer commentaire" class="deleteButton cursor" @click="deleteComment(commentData.id)">X</button>
                 </div>
             </div>
-            <div class="userButtons" v-if="pseudo === commentAuthor || isAdmin === true">
-                <button title="Modifier commentaire" class="modifyButton cursor" @click="doubleFunction">
-                    <img class="modifyIcon" src="../assets/edit-regular.svg"/>
-                </button>
-                <button title="Supprimer commentaire" class="deleteButton cursor" @click="deleteComment(commentData.id)">X</button>
+            <div id="text">
+                {{ commentData.text }}
             </div>
+            <img v-if="commentData.imageUrl" class="commentImage" :src="commentData.imageUrl" alt="image du commentaire"/>
         </div>
-        <div id="text">
-            {{ commentData.text }}
+    
+        <!-- Modification du commentaire -->
+        <div id="modifyCommentDialog" class="basics" v-if="isModifyCommentDialogOpened">
+            <div class="modifyTop">
+                <label for="post">Que voulez-vous modifier ?</label>
+                <button title="Annuler" class="cancelButton cursor" @click="doubleFunction">X</button>
+            </div>
+            <textarea class="text_modify" name="commentName_modify" rows="2" cols="35" v-model="text"></textarea>
+            <img v-if="commentData.imageUrl" class="commentImage" :src="commentData.imageUrl" alt="image du commentaire"/>
+            <div v-if="alertComment">
+                <p id="alertCommentModify" class="background_alert">Veuillez ajouter du texte ou une image</p>
+            </div>
+            <input type="file" class="input_hidden" id="comment_imageUrl_modify" name="imageUrl_modify" @change="uploadFile($event)">
+            <label for="comment_imageUrl_modify" class="imageUrl_label cursor" :value="commentData.imageUrl">Ajouter un fichier...</label>
+            <button id="modifyingButton" class="basics_buttons cursor" @click="sendModifiedComment(commentData.id)">Envoyer</button>
         </div>
-        <img v-if="commentData.imageUrl" class="commentImage" :src="commentData.imageUrl" alt="image du commentaire"/>
-    </div>
-
-    <!-- Modification du commentaire -->
-    <div id="modifyCommentDialog" class="basics" v-if="isModifyCommentDialogOpened">
-        <div class="modifyTop">
-            <label for="post">Que voulez-vous modifier ?</label>
-            <button title="Annuler" class="cancelButton cursor" @click="doubleFunction">X</button>
-        </div>
-        <textarea class="text_modify" name="commentName_modify" rows="2" cols="35" v-model="text"></textarea>
-        <img v-if="commentData.imageUrl" class="commentImage" :src="commentData.imageUrl" alt="image du commentaire"/>
-        <div v-if="alertComment">
-            <p id="alertCommentModify" class="background_alert">Veuillez ajouter du texte ou une image</p>
-        </div>
-        <input type="file" class="input_hidden" id="comment_imageUrl_modify" name="imageUrl_modify" @change="uploadFile($event)">
-        <label for="comment_imageUrl_modify" class="imageUrl_label cursor" :value="commentData.imageUrl">Ajouter un fichier...</label>
-        <button id="modifyingButton" class="basics_buttons cursor" @click="sendModifiedComment(commentData.id)">Envoyer</button>
     </div>
 </template>
 

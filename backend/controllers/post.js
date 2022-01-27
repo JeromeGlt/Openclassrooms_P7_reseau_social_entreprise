@@ -20,10 +20,6 @@ exports.getOnePost = (req, res, next) => {
 
 exports.createPost = (req, res, next) => {
 
-    if(req.body.text === 'undefined') {
-        req.body.text = null
-    }
-
     const post = Post.create({
         text: req.body.text,
         likes: 0,
@@ -37,10 +33,6 @@ exports.createPost = (req, res, next) => {
 }
 
 exports.modifyPost = (req, res, next) => {
-
-    if(req.body.text === 'undefined') {
-        req.body.text = null
-    }
 
     const postObject = req.file ? {
         text: req.body.text,

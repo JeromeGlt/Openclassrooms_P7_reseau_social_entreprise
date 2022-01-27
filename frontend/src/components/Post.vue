@@ -1,76 +1,77 @@
 <template>
-    <div id="post" class="basics" v-if="isPostOpened">
-        <div class="userComponents">
-            <div class="userImageContainer" :style="{ backgroundImage: 'url(' + postData.user.imageUrl + ')' }"></div>
-            <div class="user">
-                <div>
-                    {{ postData.user.pseudo }}
+    <div>
+        <div id="post" class="basics" v-if="isPostOpened">
+            <div class="userComponents">
+                <div class="userImageContainer" :style="{ backgroundImage: 'url(' + postData.user.imageUrl + ')' }"></div>
+                <div class="user">
+                    <div>
+                        {{ postData.user.pseudo }}
+                    </div>
+                    <div class="date">
+                        {{ formattedDate }}
+                    </div>
                 </div>
-                <div class="date">
-                    {{ formattedDate }}
+                <div class="userButtons" v-if="pseudo === postData.user.pseudo || isAdmin === true">
+                    <button title="Modifier" class="modifyButton cursor" @click="doubleFunction">
+                        <img class="modifyIcon" src="../assets/edit-regular.svg"/>
+                    </button>
+                    <button class="deleteButton cursor" title="Supprimer" @click="deletePost(postData.id)">X</button>
                 </div>
             </div>
-            <div class="userButtons" v-if="pseudo === postData.user.pseudo || isAdmin === true">
-                <button title="Modifier" class="modifyButton cursor" @click="doubleFunction">
-                    <img class="modifyIcon" src="../assets/edit-regular.svg"/>
-                </button>
-                <button class="deleteButton cursor" title="Supprimer" @click="deletePost(postData.id)">X</button>
+            <div class="cursor" id="contentPost" @click="routerPost(postData.id)">
+                <div id="text">
+                    {{ postData.text }}
+                </div>
+                <img v-if="postData.imageUrl" class="postImage" :src="postData.imageUrl" alt="image de la publication"/>
+            </div>
+            <div id="buttons">
+                <div id="likesButton">
+                    <button class="interactionButton cursor" @click="clickLike(this.postData.id, this.userId)">J'aime</button>
+                    <p id="likesNumber">{{ postData.likes.length }}</p>
+                </div>
+                <button class="interactionButton cursor" @click="showCommentDialog">Commenter</button>
+                <button class="interactionButton cursor" @click="showComments">Afficher les commentaires({{ postData.comments.length }})</button>
             </div>
         </div>
-        <div class="cursor" id="contentPost" @click="routerPost(postData.id)">
-            <div id="text">
-                {{ postData.text }}
+        <ul id="commentsList" v-if="isCommentsVisible">
+            <li v-for="comment in postData.comments" :key="comment.text">
+                <Comment :commentData="comment"/>
+            </li>
+        </ul> 
+
+        <!-- Modification -->
+
+        <div id="modifyPostDialog" class="basics" v-if="isModifyDialogOpened">
+            <div class="modifyTop">
+                <label for="post">Que voulez-vous modifier ?</label>
+                <button class="cancelButton cursor" title="Annuler" @click="doubleFunction">X</button>
             </div>
+            <textarea class="text_modify" name="postText_modify" rows="2" cols="40" v-model="text"></textarea>
             <img v-if="postData.imageUrl" class="postImage" :src="postData.imageUrl" alt="image de la publication"/>
-        </div>
-        <div id="buttons">
-            <div id="likesButton">
-                <button class="interactionButton cursor" @click="clickLike(this.postData.id, this.userId)">J'aime</button>
-                <p id="likesNumber">{{ postData.likes.length }}</p>
+            <input type="file" class="input_hidden" id="post_imageUrl_modify" name="imageUrl_modify" @change="uploadFile($event)">
+            <label for="post_imageUrl_modify" class="imageUrl_label cursor">Ajouter un fichier...</label>
+            <div id="alertPost" class="background_alert" v-if="alertPost">
+                Veuillez ajouter du texte ou une image
             </div>
-            <button class="interactionButton cursor" @click="showCommentDialog">Commenter</button>
-            <button class="interactionButton cursor" @click="showComments">Afficher les commentaires({{ postData.comments.length }})</button>
+            <button id="modifyingButton" class="basics_buttons cursor" @click="sendModifiedPost(postData.id)">Envoyer</button>
+        </div>
+
+        <!-- Commentaires -->
+
+        <div id="commentCreation" class="basics" v-if="isCommentDialogOpened">
+            <div class="separation"></div>
+            <label for="comment">Ecrire un commentaire...</label>
+            <textarea class="text_modify" name="commentName" rows="2" cols="35" v-model="text"></textarea>
+            <div id="alertComment" class="background_alert" v-if="alertComment">
+                Veuillez ajouter du texte ou une image
+            </div>
+            <div id="commentButtons">
+                <input type="file" class="input_hidden" id="comment_imageUrl" name="imageUrl" @change="uploadFile($event)">
+                <label for="comment_imageUrl" class="imageUrl_label cursor">Ajouter un fichier...</label>
+                <button id="commentSendButton" class="basics_buttons cursor" @click="sendComment(postData.id)">Envoyer</button>
+            </div>
         </div>
     </div>
-    <ul id="commentsList" v-if="isCommentsVisible">
-        <li v-for="comment in postData.comments" :key="comment.text">
-            <Comment :commentData="comment"/>
-        </li>
-    </ul> 
-
-    <!-- Modification -->
-
-    <div id="modifyPostDialog" class="basics" v-if="isModifyDialogOpened">
-        <div class="modifyTop">
-            <label for="post">Que voulez-vous modifier ?</label>
-            <button class="cancelButton cursor" title="Annuler" @click="doubleFunction">X</button>
-        </div>
-        <textarea class="text_modify" name="postText_modify" rows="2" cols="40" v-model="text"></textarea>
-        <img class="postImage" :src="postData.imageUrl" alt="image de la publication"/>
-        <input type="file" class="input_hidden" id="post_imageUrl_modify" name="imageUrl_modify" @change="uploadFile($event)">
-        <label for="post_imageUrl_modify" class="imageUrl_label cursor">Ajouter un fichier...</label>
-        <div id="alertPost" class="background_alert" v-if="alertPost">
-            Veuillez ajouter du texte ou une image
-        </div>
-        <button id="modifyingButton" class="basics_buttons cursor" @click="sendModifiedPost(postData.id)">Envoyer</button>
-    </div>
-
-    <!-- Commentaires -->
-
-    <div id="commentCreation" class="basics" v-if="isCommentDialogOpened">
-        <div class="separation"></div>
-        <label for="comment">Ecrire un commentaire...</label>
-        <textarea class="text_modify" name="commentName" rows="2" cols="35" v-model="text"></textarea>
-        <div id="alertComment" class="background_alert" v-if="alertComment">
-            Veuillez ajouter du texte ou une image
-        </div>
-        <div id="commentButtons">
-            <input type="file" class="input_hidden" id="comment_imageUrl" name="imageUrl" @change="uploadFile($event)">
-            <label for="comment_imageUrl" class="imageUrl_label cursor">Ajouter un fichier...</label>
-            <button id="commentSendButton" class="basics_buttons cursor" @click="sendComment(postData.id)">Envoyer</button>
-        </div>
-    </div>
-
 </template>
 
 <script>

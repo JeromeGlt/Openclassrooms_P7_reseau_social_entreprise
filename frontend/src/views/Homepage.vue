@@ -1,24 +1,26 @@
 <template>
-    <router-link class="linkHomepage" to='/profile'>Voir mon profil</router-link>
-    <router-link class="linkHomepage" to='/login' @click="logout">Se déconnecter</router-link>
-    <div id="createPost" class="box_shadow basics">
-        <p>{{ pseudo }},</p>
-        <label for="post">que voulez-vous partager aujourd'hui ?</label>
-        <div id="text_image">
-            <textarea name="postText" rows="3" cols="50" v-model="text"></textarea>
-            <input type="file" id="post_imageUrl" class="input_hidden" name="imageUrl" @change="uploadFile($event)">
-            <label for="post_imageUrl" id="post_imageUrl_label" class="imageUrl_label">Ajouter un fichier...</label>
+    <div>
+        <router-link class="linkHomepage" to='/profile'>Voir mon profil</router-link>
+        <router-link class="linkHomepage" to='/login' @click="logout">Se déconnecter</router-link>
+        <div id="createPost" class="box_shadow basics">
+            <p>{{ pseudo }},</p>
+            <label for="post">que voulez-vous partager aujourd'hui ?</label>
+            <div id="text_image">
+                <textarea name="postText" rows="3" cols="50" v-model="text"></textarea>
+                <input type="file" id="post_imageUrl" class="input_hidden" name="imageUrl" @change="uploadFile($event)">
+                <label for="post_imageUrl" id="post_imageUrl_label" class="imageUrl_label">Ajouter un fichier...</label>
+            </div>
+            <div id="alertPost" class="background_alert" v-if="alertPost">
+                Veuillez ajouter du texte ou une image
+            </div>
+            <button id="sendButton" class="basics_buttons cursor" @click="sendPost">Publier</button>
         </div>
-        <div id="alertPost" class="background_alert" v-if="alertPost">
-            Veuillez ajouter du texte ou une image
-        </div>
-        <button id="sendButton" class="basics_buttons cursor" @click="sendPost">Publier</button>
+        <ul>
+            <li v-for="post in posts" :key="post.text">
+                <Post :postData="post"/>
+            </li>
+        </ul>
     </div>
-    <ul>
-        <li v-for="post in posts" :key="post.text">
-            <Post :postData="post"/>
-        </li>
-    </ul>
 </template>
 
 <script>

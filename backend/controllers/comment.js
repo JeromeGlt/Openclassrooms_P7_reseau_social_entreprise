@@ -4,10 +4,6 @@ const User = require('../models/user')
 
 exports.createComment = (req, res, next) => {
 
-    if(req.body.text === 'undefined') {
-        req.body.text = null
-    }
-
     const comment = Comment.create({
         text: req.body.text,
         imageUrl: req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null,
@@ -21,10 +17,6 @@ exports.createComment = (req, res, next) => {
 }
 
 exports.modifyComment = (req, res, next) => {
-
-    if(req.body.text === 'undefined') {
-        req.body.text = null
-    }
 
     const commentObject = req.file ? {
         text: req.body.text,

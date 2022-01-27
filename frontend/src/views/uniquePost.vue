@@ -1,23 +1,25 @@
 <template>
-    <div id="post" class="box_shadow basics">
-        <div id="userPost">
-            <div class="userImageContainer" :style="{ backgroundImage: 'url(' + postAuthorImageUrl + ')' }"></div>
-            <div class="user">
-                <div>
-                    {{ postAuthor }}
-                </div>
-                <div class="date">
-                    {{ formattedDate }}
+    <div>
+        <div id="post" class="box_shadow basics">
+            <div id="userPost">
+                <div class="userImageContainer" :style="{ backgroundImage: 'url(' + postAuthorImageUrl + ')' }"></div>
+                <div class="user">
+                    <div>
+                        {{ postAuthor }}
+                    </div>
+                    <div class="date">
+                        {{ formattedDate }}
+                    </div>
                 </div>
             </div>
+            <div id="text">
+                {{ text }}
+            </div>
+            <img v-if="imageUrl" class="postImage" :src="imageUrl" alt="image de la publication"/>
         </div>
-        <div id="text">
-            {{ text }}
+        <div id="link">
+            <router-link id="HomepageLink" to="/posts">Page d'accueil</router-link>
         </div>
-        <img v-if="imageUrl" class="postImage" :src="imageUrl" alt="image de la publication"/>
-    </div>
-    <div id="link">
-        <router-link id="HomepageLink" to="/posts">Page d'accueil</router-link>
     </div>
 </template>
 
