@@ -20,5 +20,6 @@
     }
     img {
         width: 28em;
+        overflow: hidden;
     }
 </style>

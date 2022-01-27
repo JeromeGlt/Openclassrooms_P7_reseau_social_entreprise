@@ -35,7 +35,7 @@ exports.signup = (req, res, next) => {
                     pseudo: req.body.pseudo,
                     password: hash,
                     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-                    isAdmin: req.body.isAdmin ? req.body.isAdmin : 0
+                    isAdmin: 0
                 })
                 .then(user => {
                     res.status(200).json({

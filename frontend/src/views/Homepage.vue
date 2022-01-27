@@ -91,8 +91,10 @@
         margin: 1rem 0 1.5rem 0;
     }
     #text_image {
+        width: 100%;
         display: flex;
         flex-direction: column;
+        align-items: center;
         margin-top: 1.5rem;
     }
     textarea {

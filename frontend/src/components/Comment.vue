@@ -11,7 +11,7 @@
                     {{ formattedDate }}
                 </div>
             </div>
-            <div class="userButtons" v-if="pseudo === commentAuthor || isAdmin === 1">
+            <div class="userButtons" v-if="pseudo === commentAuthor || isAdmin === true">
                 <button title="Modifier commentaire" class="modifyButton cursor" @click="doubleFunction">
                     <img class="modifyIcon" src="../assets/edit-regular.svg"/>
                 </button>

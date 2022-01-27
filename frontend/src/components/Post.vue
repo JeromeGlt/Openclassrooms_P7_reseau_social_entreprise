@@ -10,14 +10,14 @@
                     {{ formattedDate }}
                 </div>
             </div>
-            <div class="userButtons" v-if="pseudo === postData.user.pseudo || isAdmin === 1">
+            <div class="userButtons" v-if="pseudo === postData.user.pseudo || isAdmin === true">
                 <button title="Modifier" class="modifyButton cursor" @click="doubleFunction">
                     <img class="modifyIcon" src="../assets/edit-regular.svg"/>
                 </button>
                 <button class="deleteButton cursor" title="Supprimer" @click="deletePost(postData.id)">X</button>
             </div>
         </div>
-        <div class="cursor" @click="routerPost(postData.id)">
+        <div class="cursor" id="contentPost" @click="routerPost(postData.id)">
             <div id="text">
                 {{ postData.text }}
             </div>
@@ -200,6 +200,9 @@
         margin-right: auto;
         box-shadow: 0 5px 7px rgba(0, 0, 0, 0.2);
     }
+    #contentPost {
+        text-align: center;
+    }
     #text {
         text-align: center;
         margin: 0 0.5rem;
@@ -208,6 +211,8 @@
         max-width: 90%;
         max-height: 20rem;
         margin-top: 1rem;
+        margin-right: auto;
+        margin-left: auto;
     }
     #buttons {
         width: 100%;

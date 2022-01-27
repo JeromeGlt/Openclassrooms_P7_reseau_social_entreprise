@@ -9,7 +9,7 @@ const store = createStore({
         imageUrl: '',
         userId: '',
         token: '',
-        isAdmin: '',
+        isAdmin: null,
         message: '',
         posts: []
     },
